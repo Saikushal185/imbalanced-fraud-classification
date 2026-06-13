@@ -20,3 +20,13 @@ def smote(X_min, n_synthetic, k=5, seed=0):
         gap = rng.random()
         out[i] = X_min[j] + gap * (nbr - X_min[j])
     return out
+
+
+def smote_resample(X, y, seed=0):
+    """Oversample the minority class up to parity with the majority."""
+    X_min = X[y == 1]
+    n_needed = int((y == 0).sum() - (y == 1).sum())
+    synth = smote(X_min, n_needed, seed=seed)
+    X_res = np.vstack([X, synth])
+    y_res = np.r_[y, np.ones(len(synth), dtype=int)]
+    return X_res, y_res
