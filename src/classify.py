@@ -56,3 +56,33 @@ def main():
         X, y, test_size=0.3, stratify=y, random_state=17)
     sc = StandardScaler().fit(Xtr)
     Xtr, Xte = sc.transform(Xtr), sc.transform(Xte)
+
+    models = {}
+    models["baseline"] = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
+    models["class_weight"] = LogisticRegression(
+        max_iter=1000, class_weight="balanced").fit(Xtr, ytr)
+    Xrs, yrs = smote_resample(Xtr, ytr, seed=17)
+    models["smote"] = LogisticRegression(max_iter=1000).fit(Xrs, yrs)
+
+    naive_acc = max(yte.mean(), 1 - yte.mean())
+    print(f"Test set: {len(yte):,} txns, {yte.mean()*100:.2f}% fraud")
+    print(f'"Always legit" accuracy = {naive_acc*100:.2f}% but catches 0 fraud\n')
+    print(f"{'model':<13} {'PR-AUC':>7} {'ROC-AUC':>8} {'recall':>7} "
+          f"{'precision':>10} {'cost':>8}")
+
+    curves, results = {}, {}
+    for name, m in models.items():
+        proba = m.predict_proba(Xte)[:, 1]
+        ap = average_precision_score(yte, proba)
+        roc = roc_auc_score(yte, proba)
+        cost, tp, fp, fn = cost_at_threshold(yte, proba, 0.5)
+        rec = tp / (tp + fn + 1e-9)
+        prec = tp / (tp + fp + 1e-9)
+        curves[name] = precision_recall_curve(yte, proba)
+        results[name] = {"pr_auc": round(ap, 4), "roc_auc": round(roc, 4),
+                         "recall@0.5": round(rec, 4),
+                         "precision@0.5": round(prec, 4),
+                         "cost@0.5": round(cost, 1)}
+        print(f"{name:<13} {ap:>7.4f} {roc:>8.4f} {rec:>7.3f} "
+              f"{prec:>10.3f} {cost:>8.0f}")
+
