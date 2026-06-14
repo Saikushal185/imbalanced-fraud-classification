@@ -47,3 +47,12 @@ def best_cost_threshold(y, proba):
     i = int(np.argmin(costs))
     return float(thrs[i]), float(costs[i])
 
+
+def main():
+    df = pd.read_csv(DATA)
+    X = df.drop(columns="is_fraud").to_numpy()
+    y = df["is_fraud"].to_numpy()
+    Xtr, Xte, ytr, yte = train_test_split(
+        X, y, test_size=0.3, stratify=y, random_state=17)
+    sc = StandardScaler().fit(Xtr)
+    Xtr, Xte = sc.transform(Xtr), sc.transform(Xte)
