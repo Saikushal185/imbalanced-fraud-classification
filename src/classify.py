@@ -34,3 +34,16 @@ DATA = ROOT / "data" / "transactions.csv"
 REPORTS = ROOT / "reports"
 FN_COST, FP_COST = 20.0, 1.0
 
+
+def cost_at_threshold(y, proba, thr):
+    pred = (proba >= thr).astype(int)
+    tn, fp, fn, tp = confusion_matrix(y, pred).ravel()
+    return fn * FN_COST + fp * FP_COST, tp, fp, fn
+
+
+def best_cost_threshold(y, proba):
+    thrs = np.linspace(0.01, 0.99, 99)
+    costs = [cost_at_threshold(y, proba, t)[0] for t in thrs]
+    i = int(np.argmin(costs))
+    return float(thrs[i]), float(costs[i])
+
