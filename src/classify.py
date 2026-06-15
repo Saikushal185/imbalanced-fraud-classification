@@ -114,3 +114,7 @@ def main():
     plt.legend(); plt.tight_layout()
     plt.savefig(REPORTS / "pr_curves.png", dpi=110)
     print(f"Wrote {REPORTS/'metrics.json'} and {REPORTS/'pr_curves.png'}")
+
+
+if __name__ == "__main__":
+    main()
