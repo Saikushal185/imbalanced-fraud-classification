@@ -86,3 +86,31 @@ def main():
         print(f"{name:<13} {ap:>7.4f} {roc:>8.4f} {rec:>7.3f} "
               f"{prec:>10.3f} {cost:>8.0f}")
 
+    # Cost-based threshold tuning on the baseline model
+    proba = models["baseline"].predict_proba(Xte)[:, 1]
+    thr, cost = best_cost_threshold(yte, proba)
+    _, tp, fp, fn = cost_at_threshold(yte, proba, thr)
+    results["threshold_tuned"] = {
+        "threshold": round(thr, 3), "cost": round(cost, 1),
+        "recall": round(tp / (tp + fn + 1e-9), 4),
+        "precision": round(tp / (tp + fp + 1e-9), 4)}
+    print(f"\nCost-tuned threshold = {thr:.2f}  -> cost {cost:.0f} "
+          f"(vs {results['baseline']['cost@0.5']:.0f} at 0.5), "
+          f"recall {results['threshold_tuned']['recall']:.3f}")
+
+    REPORTS.mkdir(exist_ok=True)
+    (REPORTS / "metrics.json").write_text(json.dumps(
+        {"prevalence": float(yte.mean()), "naive_accuracy": float(naive_acc),
+         "cost_model": {"fn": FN_COST, "fp": FP_COST},
+         "models": results}, indent=2))
+
+    plt.figure(figsize=(7, 5))
+    for name, (p, r, _) in curves.items():
+        plt.plot(r, p, label=f"{name} (AP={results[name]['pr_auc']:.3f})")
+    plt.axhline(yte.mean(), ls="--", color="grey",
+                label=f"random ({yte.mean():.3f})")
+    plt.xlabel("recall"); plt.ylabel("precision")
+    plt.title("Precision-Recall curves — imbalanced fraud")
+    plt.legend(); plt.tight_layout()
+    plt.savefig(REPORTS / "pr_curves.png", dpi=110)
+    print(f"Wrote {REPORTS/'metrics.json'} and {REPORTS/'pr_curves.png'}")
