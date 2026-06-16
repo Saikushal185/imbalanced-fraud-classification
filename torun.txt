@@ -1,0 +1,17 @@
+HOW TO RUN — Imbalanced Fraud Classification
+============================================
+
+1. Install dependencies:
+       pip install -r requirements.txt
+
+2. Generate the synthetic ~1%-fraud transaction set:
+       python3 src/generate_data.py
+
+3. Compare imbalance treatments (baseline, class-weight, SMOTE, threshold):
+       python3 src/classify.py
+
+Outputs:
+   reports/metrics.json   — PR-AUC / ROC-AUC / recall / precision / cost per model
+   reports/pr_curves.png  — precision-recall curves vs the random baseline
+
+Or just run everything:  ./run.sh
