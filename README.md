@@ -16,3 +16,32 @@ treatments on **PR-AUC, recall, and a business cost model**.
 - **PR curves over ROC** — precision-recall is the honest picture under heavy
   imbalance.
 
+## Demo
+
+```text
+$ python3 src/classify.py
+Test set: 12,000 txns, 1.20% fraud
+"Always legit" accuracy = 98.80% but catches 0 fraud
+
+model          PR-AUC  ROC-AUC  recall  precision     cost
+baseline       0.9362   0.9930   0.875      0.969      364
+class_weight   0.9384   0.9930   0.944      0.402      362
+smote          0.9410   0.9936   0.951      0.449      308
+
+Cost-tuned threshold = 0.07  -> cost 255 (vs 364 at 0.5), recall 0.924
+```
+
+Class weights and SMOTE trade precision for the recall that actually matters
+when misses are expensive; **tuning the threshold to the cost model** beats all
+of them on total cost. `reports/pr_curves.png` plots precision-recall against
+the random-classifier floor.
+
+## Treatments
+
+| Treatment | Where | Idea |
+|---|---|---|
+| Baseline | `src/classify.py` | logistic regression, threshold 0.5 |
+| Class weights | `src/classify.py` | reweight the loss toward the minority |
+| SMOTE | `src/smote.py` | synthesize minority samples to parity |
+| Threshold tuning | `src/classify.py` | minimise FN×20 + FP×1 expected cost |
+
