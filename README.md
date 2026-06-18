@@ -45,3 +45,21 @@ the random-classifier floor.
 | SMOTE | `src/smote.py` | synthesize minority samples to parity |
 | Threshold tuning | `src/classify.py` | minimise FN×20 + FP×1 expected cost |
 
+## Project structure
+```
+imbalanced-fraud-classification/
+├── data/transactions.csv   # generated ~1.2%-fraud transactions
+├── src/
+│   ├── generate_data.py    # overlapping legit/fraud distributions
+│   ├── smote.py            # from-scratch SMOTE oversampling
+│   └── classify.py         # 4 treatments, PR-AUC, cost-based threshold
+├── reports/                # metrics.json, pr_curves.png
+├── requirements.txt
+├── torun.txt
+└── license.md
+```
+
+## Run it
+```bash
+./run.sh        # or see torun.txt
+```
