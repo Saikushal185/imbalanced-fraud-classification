@@ -63,3 +63,7 @@ imbalanced-fraud-classification/
 ```bash
 ./run.sh        # or see torun.txt
 ```
+
+**Production swap**: move to gradient-boosted trees (XGBoost/LightGBM) with
+`scale_pos_weight`, calibrate probabilities, and set the threshold from the
+real fraud-loss vs review-cost ratio; monitor precision/recall drift over time.
