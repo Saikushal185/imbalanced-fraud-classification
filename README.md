@@ -67,3 +67,8 @@ imbalanced-fraud-classification/
 **Production swap**: move to gradient-boosted trees (XGBoost/LightGBM) with
 `scale_pos_weight`, calibrate probabilities, and set the threshold from the
 real fraud-loss vs review-cost ratio; monitor precision/recall drift over time.
+
+## Reproducibility
+Data generation (`SEED=17`), the stratified split (`random_state=17`) and the
+SMOTE sampler (`seed=17`) are all seeded, so the PR-AUC / cost table and the
+precision-recall plot reproduce exactly on any machine.
